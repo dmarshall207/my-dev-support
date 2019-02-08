@@ -80,5 +80,6 @@ process.stderr.write(`\nglob    : [${glob}]\n`)
 process.stderr.write(`re_pat  : [${re_pat}]\n`)
 process.stderr.write(`results : ...\n`)
 run_powershell_cmd(cmd)
+// console.log(process.argv)
 
 
