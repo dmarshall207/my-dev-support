@@ -59,7 +59,11 @@ let re_pat              = args[1]     // regexp match pattern
 let cmd_matches   = ["Get-ChildItem", 
                      //"-path", "C:\\dlm\\work\\try-code",
                     //  "-path", "C:/dlm/work/try-code",
-                     "-recurse", "-include", glob, "|", "Select-String", "-pattern", re_pat]
+
+                    // ORIG -- prob w/ parent
+                     "-recurse", "-include", glob, "|", "Select-String", "-pattern", re_pat
+
+                    ]
 
 let cmd_names     = cmd_matches.concat( 
                         ["|", "group", "path", 
@@ -73,13 +77,21 @@ else if (args.length === 3) {
 else {
        throw "err2"}
 
-console.log('cmd:', cmd.join(' ') );
+console.log('cmd:\n', cmd.join(' ') );
+
+// PROBLEM:
+//   * unable to pass a string through w/ properly escaped parent. chars
+//   * the following from the command line does what I want but I
+//     can not get nodejs to generate the properly formted -pattern string
+//
+//          *  Get-ChildItem -recurse -include *.js | Select-String -pattern '\(:[a-z0-9_-]+ +"'
 
 // ------[ run 
 process.stderr.write(`\nglob    : [${glob}]\n`)
 process.stderr.write(`re_pat  : [${re_pat}]\n`)
 process.stderr.write(`results : ...\n`)
-run_powershell_cmd(cmd)
+// run_powershell_cmd(cmd)
+
 // console.log(process.argv)
 
 
