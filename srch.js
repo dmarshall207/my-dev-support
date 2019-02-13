@@ -61,8 +61,11 @@ let cmd_matches   = ["Get-ChildItem",
                     //  "-path", "C:/dlm/work/try-code",
 
                     // ORIG -- prob w/ parent
-                     "-recurse", "-include", glob, "|", "Select-String", "-pattern", re_pat
+                    // "-recurse", "-include", glob, "|", "Select-String", "-pattern", re_pat
 
+                    // (:refcode  "calling Powershell with formated strings for regexps")
+                    // :BINGO  --  works w/ cmd line:     srch *.js "\(:refcode"
+                     "-recurse", "-include", `'${glob}'`, "|", "Select-String", "-pattern", `'${re_pat}'`
                     ]
 
 let cmd_names     = cmd_matches.concat( 
@@ -90,8 +93,5 @@ console.log('cmd:\n', cmd.join(' ') );
 process.stderr.write(`\nglob    : [${glob}]\n`)
 process.stderr.write(`re_pat  : [${re_pat}]\n`)
 process.stderr.write(`results : ...\n`)
-// run_powershell_cmd(cmd)
-
+run_powershell_cmd(cmd)
 // console.log(process.argv)
-
-
