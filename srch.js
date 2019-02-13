@@ -3,23 +3,16 @@
 //=== snip === snip === snip === snip === snip === 
 
 
-var spawn = require("child_process").spawn,child;
+var spawn               = require("child_process").spawn,child;
+// var _                   = require("underscore");
 
 // from example:
 //      * https://stackoverflow.com/questions/8153750/how-to-search-a-string-in-multiple-files-and-return-the-names-of-files-in-powers
 // Get-ChildItem -recurse | Get-Content | Select-String -pattern "dummy"
 // Get-ChildItem -recurse | Select-String -pattern "dummy" | group path | select name
 
-// test calls:
-// Get-ChildItem -recurse -include *.js | Select-String -pattern testthis2
-// Get-ChildItem -path "C:\dlm\work\try-code" -recurse -include *.js | Select-String -pattern testthis2
 
-// my vers: srch *.js for "fs"
-// Get-ChildItem *.js | Select-String -pattern "fs"
-// Get-ChildItem *.js | Select-String -pattern "fs" | group path | select name
-
-// ------[ aux 
-// (:refcode "run 'powershell' command via call to 'spawn'")
+// (:refcode "run 'powershell' command via call to 'spawn' -- w/o Promise")
 function run_powershell_cmd(cmd) {
     if (! (cmd instanceof Array)) {
         throw "\nerr: 'run_powershell_cmd': CMD not an array\n\n"}
@@ -33,65 +26,64 @@ function run_powershell_cmd(cmd) {
         process.stderr.write('_done_\n')})
     child.stdin.end()}
 
+// (:refcode "run 'powershell' command via call to 'spawn' -- w/ Promise")
+function run_powershell_cmd_2(cmd) {
+    return new Promise((resolve, reject) => {
+        let sig         = [];
+        let handle_stdout  = (data)=>{
+            process.stdout.write(data)
+            sig.push(`${data}`)}
+        let handle_stderr  = (data)=>{
+            process.stderr.write(`err: ${data}`)}
+        let handle_exit  = ()=>{
+            process.stderr.write('_done_\n')
+            resolve(sig)}           // :key -- causes 'await' return
+        if (! (cmd instanceof Array)) {
+            throw "\nerr: 'run_powershell_cmd': CMD not an array\n\n"}
+        cmd.unshift("-Command")
+        child = spawn("powershell.exe",cmd);
+        child.stdout.on("data", handle_stdout)
+        child.stderr.on("data", handle_stderr)
+        child.on(       "exit", handle_exit)
+        child.stdin.end()})}             // ????
 
-// ------[ config
-// <sec>
-//    ||  this was previous to using 'process.argv'
-// let glob          = "*.js"
-// let re_pat        = "fs"     // regexp match pattern
-// </sec>
 
-if (! (process.argv.length === 4 || process.argv.length === 5)) {
-    console.log( process.argv );
-    process.stderr.write('\nerr: requires 2 args -- can have 3:\n')
-    process.stderr.write('   1)  glob pattern\n')
-    process.stderr.write('   2)  regexp pattern\n')
-    process.stderr.write('   3)  any value = so results as file names\n\n')
-    throw "err" }
-    
+function check_cmd_line() {
+    if (! (process.argv.length === 4 || process.argv.length === 5)) {
+        console.log( process.argv );
+        process.stderr.write('\nerr: requires 2 args -- can have 3:\n')
+        process.stderr.write('   1)  glob pattern\n')
+        process.stderr.write('   2)  regexp pattern\n')
+        process.stderr.write('   3)  any value = so results as file names\n\n')
+        throw "err" }}
+
+function build_cmd(args) {
+    let cmd                 = false
+    let [glob, re_pat]      = args.slice(0,2)
+    if (args.length === 2) {           // display file-name + match line
+            cmd     = ["Get-ChildItem", 
+                       "-recurse", "-include", `'${glob}'`, 
+                       "|", "Select-String", "-pattern", `'${re_pat}'`]}
+    else if (args.length === 3) {     // display file-name only
+            cmd     = ["Get-ChildItem", 
+                       "-recurse", "-include", `'${glob}'`, 
+                       "|", "Select-String", "-pattern", `'${re_pat}'`,
+                       "|", "group", "path", 
+                       "|", "select", "name"]}
+    else { throw "err - 'build_cmd'"}
+    return cmd}
+
+let cmd                 = build_cmd( process.argv.slice(2) )
+let cmd_str             = cmd.join(' ')
 let args                = process.argv.slice(2)
-let glob                = args[0]
-let re_pat              = args[1]     // regexp match pattern
-
-// let cmd_matches   = ["Get-ChildItem", glob, "|", "Select-String", "-pattern", re_pat]
-// let cmd_matches   = ["Get-ChildItem", glob, "-recurse", "|", "Select-String", "-pattern", re_pat]
-// let cmd_matches   = ["Get-ChildItem", "-recurse", "-include", glob, "|", "Select-String", "-pattern", re_pat]
-let cmd_matches   = ["Get-ChildItem", 
-                     //"-path", "C:\\dlm\\work\\try-code",
-                    //  "-path", "C:/dlm/work/try-code",
-
-                    // ORIG -- prob w/ parent
-                    // "-recurse", "-include", glob, "|", "Select-String", "-pattern", re_pat
-
-                    // (:refcode  "calling Powershell with formated strings for regexps")
-                    // :BINGO  --  works w/ cmd line:     srch *.js "\(:refcode"
-                     "-recurse", "-include", `'${glob}'`, "|", "Select-String", "-pattern", `'${re_pat}'`
-                    ]
-
-let cmd_names     = cmd_matches.concat( 
-                        ["|", "group", "path", 
-                         "|", "select", "name"])
-
-let cmd                 = "no yet set"
-if (args.length === 2) {
-       cmd     = cmd_matches} 
-else if (args.length === 3) {
-       cmd     = cmd_names}
-else {
-       throw "err2"}
-
-console.log('cmd:\n', cmd.join(' ') );
-
-// PROBLEM:
-//   * unable to pass a string through w/ properly escaped parent. chars
-//   * the following from the command line does what I want but I
-//     can not get nodejs to generate the properly formted -pattern string
-//
-//          *  Get-ChildItem -recurse -include *.js | Select-String -pattern '\(:[a-z0-9_-]+ +"'
-
-// ------[ run 
-process.stderr.write(`\nglob    : [${glob}]\n`)
+let [glob, re_pat]      = args.slice(0,2)
+process.stderr.write(`\ncmd     : ${cmd_str}\n`)
+process.stderr.write(`glob    : [${glob}]\n`)
 process.stderr.write(`re_pat  : [${re_pat}]\n`)
-process.stderr.write(`results : ...\n`)
-run_powershell_cmd(cmd)
-// console.log(process.argv)
+process.stderr.write(`results : ...\n`);
+
+// run_powershell_cmd(cmd)                          // call ver setup w/o Promise
+(async ()=>{                                        // call ver setup w/ Promise
+    let r    = await run_powershell_cmd_2(cmd)})();
+
+
