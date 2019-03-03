@@ -15,12 +15,18 @@ let fs            = require('fs')
 function backslash_dbl_quotes(s) {    // good
     // return str 's' with added '\' to double quotes chars
     return s.replace( /([""])/g, '\\$1')}
+function double_up_backslash(s) {    // good
+    // return str 's' with added '\' to double quotes chars
+    return s.replace( /([\\])/g, '\\\\')}
+
 function gen_snippet_body(input_path) {
     let dat     = `${fs.readFileSync(input_path)}`
     let arr     = dat.split('\n')
     let sig     = []
+    let s_      = ''
     arr.forEach((s,i)=>{
-        let s_          = backslash_dbl_quotes(s)
+        s_              = double_up_backslash(s)
+        s_          = backslash_dbl_quotes(s_)
         sig.push(`    "${s_.trimEnd() }",`)})
     let dat_as_snippet_body = `"body": [\n${sig.join('\n')}\n    ],`
     // fs.writeFileSync('./out.js', dat_as_snippet_body)
