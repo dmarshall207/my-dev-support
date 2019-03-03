@@ -21,8 +21,8 @@ function gen_snippet_body(input_path) {
     let sig     = []
     arr.forEach((s,i)=>{
         let s_          = backslash_dbl_quotes(s)
-        sig.push(`"    ${s_.trimEnd() }",`)})
-    let dat_as_snippet_body = `body: [\n${sig.join('\n')}\n]`
+        sig.push(`    "${s_.trimEnd() }",`)})
+    let dat_as_snippet_body = `"body": [\n${sig.join('\n')}\n    ],`
     // fs.writeFileSync('./out.js', dat_as_snippet_body)
     console.log(dat_as_snippet_body)}
 // gen_snippet_body('./input.js')
@@ -42,5 +42,5 @@ if (! fs.existsSync(input_file_path)){
     console.log('\nERR: input-file')
     console.log(`  * input-file not found: ${input_file_path}\n`)
     process.exit(1)}
-    
+
 gen_snippet_body(input_file_path)
