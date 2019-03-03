@@ -5,6 +5,7 @@ https://stackoverflow.com/questions/2447915/javascript-string-regex-backreferenc
 http://webreference.com/js/column5/values.html
 */
 
+
 // ===========================================================
 // require
 let fs            = require('fs')
@@ -28,15 +29,18 @@ function gen_snippet_body(input_path) {
 
 // ==========================================================
 // main 
-console.log( process.argv )
 if (process.argv.length < 3) {
     console.log('\nERR : command-line : invalid format')
     console.log('   * explects: #1 arg:      input file\n')
     process.exit(1)}
+
+
 let input_file_path         = process.argv[2];
-console.log(`input_file_path: ${input_file_path}`)
+// console.log(`input_file_path: ${input_file_path}`)
+
 if (! fs.existsSync(input_file_path)){
     console.log('\nERR: input-file')
     console.log(`  * input-file not found: ${input_file_path}\n`)
     process.exit(1)}
+    
 gen_snippet_body(input_file_path)
