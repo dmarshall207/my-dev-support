@@ -8,4 +8,16 @@ function list_my_env_vars() {
     keys.push('SnippetsDirPath')
     keys.forEach((k,i)=>{
         console.log(`${k.padEnd(20,' ')} : ${process.env[k]}`)})}
+
+if (! process.env.StoRoot ){
+    console.log('\nERR: environment-vars-not-set')
+    console.log('    * my stanard env vars have not been set\n')
+    console.log("$Env:StoRoot = \"c:\\sto\"")
+    console.log("$Env:MyDocRoot = \"c:\\sto\\my-doc\"")
+    console.log("$Env:StoBinRoot = \"c:\\sto\\bin\"")
+    console.log("$Env:StoMyRoot = \"c:\\sto\"")
+    console.log("$Env:SnippetsDirPath = \"C:\\Users\\User\\AppData\\Roaming\\Code\\User\\snippets\"")
+    console.log() 
+    process.exit()}
+        
 list_my_env_vars()
