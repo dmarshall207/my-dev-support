@@ -28,7 +28,7 @@ function install_my_code_snippets(
             let dst_file_path   = `${dst_dir_path}\\${file}`
             console.log(`...     file: '${file}'`)
             console.log(`${dst_file_path}`)
-            fs.copyFileSync(src_file_path, dst_file_path)})}}
+            fs.copyFileSync(src_file_path, dst_file_path)})}}g
 install_my_code_snippets(
     `${process.env.StoRoot}\\my-doc`,    // 'c:/sto/my-doc'
     process.env.SnippetsDirPath,         // "C:\Users\public$($Env:UserId)\AppData\Roaming\Code\User\snippets"
