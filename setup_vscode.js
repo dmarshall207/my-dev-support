@@ -20,7 +20,7 @@ function install_my_code_snippets(
         console.log(`  count: ${not_valid.length}`)
         console.log(`  files:`)
         not_valid.forEach(f => {console.log(`     * '${f}'`)})
-        console.log()}
+        console.log('\n... no files were copied ...\n')}
     else {
         console.log('... copying snippet files ....')
         valid.forEach(file => {
@@ -28,7 +28,7 @@ function install_my_code_snippets(
             let dst_file_path   = `${dst_dir_path}\\${file}`
             console.log(`...     file: '${file}'`)
             console.log(`${dst_file_path}`)
-            fs.copyFileSync(src_file_path, dst_file_path)})}}g
+            fs.copyFileSync(src_file_path, dst_file_path)})}}
 install_my_code_snippets(
     `${process.env.StoRoot}\\my-doc`,    // 'c:/sto/my-doc'
     process.env.SnippetsDirPath,         // "C:\Users\public$($Env:UserId)\AppData\Roaming\Code\User\snippets"
