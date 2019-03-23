@@ -6,6 +6,7 @@ function list_my_env_vars() {
                             return s.match(want_re)})}
     let keys        = env_keys_filter(/^Sto/)
     keys.push('SnippetsDirPath')
+    keys.push('UserId')
     keys.forEach((k,i)=>{
         console.log(`${k.padEnd(20,' ')} : ${process.env[k]}`)})}
 
@@ -18,6 +19,6 @@ if (! process.env.StoRoot ){
     console.log("$Env:StoMyRoot = \"c:\\sto\"")
     console.log("$Env:SnippetsDirPath = \"C:\\Users\\User\\AppData\\Roaming\\Code\\User\\snippets\"")
     console.log() 
-    process.exit()}
-        
-list_my_env_vars()
+    process.exit()
+} else {
+    list_my_env_vars() }
