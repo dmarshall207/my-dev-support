@@ -47,8 +47,8 @@ if (args[0] === 'run') {
     const finder      = make_regex_finder(match_re, only_names)
     walk_dir(
         './',
-        (d,f,p)=>{                           // callback - for each match
-            finder(d, f, p)},
+        // (d,f,p)=>{finder(d, f, p)},                           // callback - for each match
+        finder,
         (d,f,p)=>f.match(ext_re),           // "want" predicate - filter
         (d,f,p)=>false)                     // "prune" - filter-not dir recusrion
 } else {
