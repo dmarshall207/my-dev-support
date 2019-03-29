@@ -1,4 +1,4 @@
-// https://stackoverflow.com/questions/2727167/how-do-you-get-a-list-of-the-names-of-all-files-present-in-a-directory-in-node-j
+// :d this will replace 'srch.js'
 
 const fs                = require('fs');
 const {walk_dir}        = require('dm-std-1');
@@ -15,8 +15,7 @@ function make_regex_finder(re_str,  only_names) {
         while (m = re.exec(text)) {
                 if (first) {
                     console.log(`|||||||| ${path}`)
-                    first    = false
-                }
+                    first    = false}
                 if (only_names) {
                     return
                 } else {
