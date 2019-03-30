@@ -14,10 +14,17 @@ let fs            = require('fs')
 // core
 function backslash_dbl_quotes(s) {    // good
     // return str 's' with added '\' to double quotes chars
-    return s.replace( /([""])/g, '\\$1')}
+    return s.replace( /([""])/g, '\\$1')}    // (:refcode "use of regex back ref in replacment string")
 function double_up_backslash(s) {    // good
     // return str 's' with added '\' to double quotes chars
     return s.replace( /([\\])/g, '\\\\')}
+
+function escape_dollar_sign(s) {
+    // :ISSUE : for this to be a regerious -- need to only replace if
+    // the occurace is w/in a backtick string template -- consider using
+    // my state-mach logic -- rather than shadowing the sting will extract
+    // the string
+    return s.replace( /\$/g, '\\\\$')}
 
 function gen_snippet_body(input_path) {
     let dat     = `${fs.readFileSync(input_path)}`
@@ -25,8 +32,10 @@ function gen_snippet_body(input_path) {
     let sig     = []
     let s_      = ''
     arr.forEach((s,i)=>{
-        s_              = double_up_backslash(s)
+        s_          = double_up_backslash(s)
         s_          = backslash_dbl_quotes(s_)
+        // s_          = escape_dollar_sign(s_)   // see notes in function
+
         sig.push(`    "${s_.trimEnd() }",`)})
     let dat_as_snippet_body = `"body": [\n${sig.join('\n')}\n    ],`
     // fs.writeFileSync('./out.js', dat_as_snippet_body)
