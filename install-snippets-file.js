@@ -30,8 +30,9 @@ function copy_file_2(
                 console.log()} 
             else {
                 console.log('\n... no action taken ...\n')
-                process.exit(1)}}}
-
+                process.exit(1)}}
+            else {
+                fs.copyFileSync(src_file_path, dst_file_path)}}
 
 copy_file_2(
     'dm1.code-snippets',
