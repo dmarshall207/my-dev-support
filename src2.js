@@ -62,6 +62,7 @@ function show_usage() {
     --names, -n        : flag : only print file names w/ matches
     --ext, -x          : file extension to search
     --regex, -r        : regex for matches
+    --prune, -p        : regex for skip subdirs - by name
     `)}
 
 const args          = process.argv.slice(2)
