@@ -5,28 +5,50 @@ const {walk_dir}        = require('dm-std-1');
 const {compile_option_specs,
        parse_cmd_line}        = require('dm-std-1');
 // =====================================================================
-function build_file_name_regex(ext_list) {
-    let ar  = ext_list.map((s)=>`\\.${s}`)
-    return new RegExp( ar.join('|'), 'i')
-}    
+
+// SAFE - ORIG - HAVING PROBEMS ???
+// function make_regex_finder(re_str,  only_names) {
+//     // returns closure that searches for 're_str' in 'path'
+//     // and output each match -- labled by the path
+//     return (dir, file, path)=>{
+//         // console.log(`> path ${path}`)
+//         let text        = fs.readFileSync(path)
+//         let re          = new RegExp(re_str, "ig");
+//         let m;
+//         let first       = true;
+//         while (m = re.exec(text)) {
+//                 if (first) {
+//                     console.log(`\n|||||||| ${path}`)
+//                     first    = false}
+//                 if (only_names) {
+//                     return
+//                 } else {
+//                     console.log(`${file}:  ${m[0].trim()}`)}}}
+// }
+
 function make_regex_finder(re_str,  only_names) {
     // returns closure that searches for 're_str' in 'path'
     // and output each match -- labled by the path
     return (dir, file, path)=>{
-        // console.log(`> path ${path}`)
-        let text        = fs.readFileSync(path)
-        let re          = new RegExp(re_str, "ig");
-        let m;
-        let first       = true;
-        while (m = re.exec(text)) {
-                if (first) {
-                    console.log(`\n|||||||| ${path}`)
-                    first    = false}
-                if (only_names) {
-                    return
-                } else {
-                    console.log(`${file}:  ${m[0].trim()}`)}}}
+        // console.log('xxxxx',path)
+        if (fs.statSync(path).isDirectory()){
+            // not a file --- how did this work before ???
+        } else {
+            let text        = fs.readFileSync(path)
+            let re          = new RegExp(re_str, "ig");
+            let m;
+            let first       = true;
+            while (m = re.exec(text)) {
+                    if (first) {
+                        console.log(`\n|||||||| ${path}`)
+                        first    = false}
+                    if (only_names) {
+                        return
+                    } else {
+                        console.log(`${file}:  ${m[0].trim()}`)}}}
+    }
 }
+
 function show_usage() {
     // console.log(`
     // argument postion / semantics:
@@ -53,6 +75,9 @@ let option_spec     = compile_option_specs({
 
                             "--regex"   : [1, 'regex'],
                             "-r"        : [1, 'regex'],
+
+                            "--prune"   : [1, 'prune'],
+                            "-p"        : [1, 'prune'],
                         
                             "--help"    : [0, 'help'],
                             "-h"        : [0, 'help'],
@@ -67,13 +92,42 @@ if (option.help) {
 if ((! option.regex) || (! option.extension)) {
     show_usage()
     process.exit()}
-const ext_re        = build_file_name_regex(
-                            option.extension.split(','))
+
+// :LESSON : node command line passes .... replacse ','
+//  with space if there is not quotes around the list
+function build_spec_regex(raw) {
+    function build_or_regex(ext_list) {
+        let ar  = ext_list.map((s)=>`\\.${s}`)
+        return new RegExp( ar.join('|'), 'i')
+    }
+    let re                  = false
+    if (! raw) {
+        return false}
+    let has_comma           = raw.match(',')
+    let has_space           = raw.match(' ')
+    if (has_comma && has_space) {
+        console.log('\nERR:  oops  both commas and spaces -- ambigious situation')
+        process.exit()
+    } else if (has_comma) {
+        re    = build_or_regex( raw.split(',') )
+    } else if (has_space) {
+        re    = build_or_regex( raw.split(' ') )
+    } else {
+        re    = new RegExp(raw)
+    }
+    return re 
+}
+
+const ext_re        = build_spec_regex(option.extension)
+const prune_re      = build_spec_regex(option.prune)
 const match_re      = `\\n.*?${option.regex}.*`
 const finder        = make_regex_finder(match_re, option.names_only)  // closure to search a file for matches
 walk_dir(
     './',                               // root to start walk/search from
-    // (d,f,p)=>{finder(d, f, p)},     // callback - for each match
-    finder,
+    finder,                             // callback - for each match
     (d,f,p)=>f.match(ext_re),           // "want" predicate - filter
-    (d,f,p)=>false)                     // "prune" - filter-not dir recusrion
+    (d,f,p)=>{                          // prune
+        if (prune_re) {
+            return f.match(prune_re)} 
+        else {
+            return false}})
