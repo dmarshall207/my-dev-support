@@ -66,23 +66,37 @@ function show_usage() {
     `)}
 
 const args          = process.argv.slice(2)
-let option_spec     = compile_option_specs({
-                            // "-v"     : [0, 'verbose'],
-                            "--names"   : [0, 'names_only'],
-                            "-n"        : [0, 'names_only'],
 
-                            "--ext"     : [1, 'extension'],
-                            "-x"        : [1, 'extension'],
+// let option_spec     = compile_option_specs({
+//                             // "-v"     : [0, 'verbose'],
+//                             "--names"   : [0, 'names_only'],
+//                             "-n"        : [0, 'names_only'],
+//                             "--ext"     : [1, 'extension'],
+//                             "-x"        : [1, 'extension'],
+//                             "--regex"   : [1, 'regex'],
+//                             "-r"        : [1, 'regex'],
+//                             "--prune"   : [1, 'prune'],
+//                             "-p"        : [1, 'prune'],
+//                             "--help"    : [0, 'help'],
+//                             "-h"        : [0, 'help'],
+//                         })
+let option_spec  = {
+    // "-v"     : [0, 'verbose'],
+    "--names"   : [0, 'names_only'],
+    "-n"        : [0, 'names_only'],
 
-                            "--regex"   : [1, 'regex'],
-                            "-r"        : [1, 'regex'],
+    "--ext"     : [1, 'extension'],
+    "-x"        : [1, 'extension'],
 
-                            "--prune"   : [1, 'prune'],
-                            "-p"        : [1, 'prune'],
-                        
-                            "--help"    : [0, 'help'],
-                            "-h"        : [0, 'help'],
-                        })
+    "--regex"   : [1, 'regex'],
+    "-r"        : [1, 'regex'],
+
+    "--prune"   : [1, 'prune'],
+    "-p"        : [1, 'prune'],
+
+    "--help"    : [0, 'help'],
+    "-h"        : [0, 'help'],
+}
 
 let [option, cmd_line]   = parse_cmd_line(option_spec, args)
 // console.log(option)
