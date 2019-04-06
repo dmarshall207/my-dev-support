@@ -16,6 +16,8 @@ const opt = parse_cmd_line(
                 },)
 // :d - may need to fix/adjust path sperator chars
 function show_match(d,f,p) {
+    p       = p.replace(/\//g, '\\') 
+    // console.log(p)
     if (opt.html)   {console.log(`<a href="${p}">${p}</a>`)}
      else           {console.log(`${p}`)}
 }
@@ -27,6 +29,12 @@ function search_file(path, re_str) {
             //            else           {return false}}
              )
 }
+
+if (opt.html) {console.log('<pre>')}
 search_file(process.env.StoMy, 'meta')
+if (opt.html) {console.log('</pre>')}
+
+// console.log('hi')
+// console.log( 'ab/cde'.replace(/\//,'X') )
 
 
