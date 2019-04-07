@@ -1,5 +1,4 @@
 // :d this will replace 'srch.js'
-
 const fs                = require('fs');
 const {walk_dir}        = require('dm-std-1');
 const {compile_option_specs,
@@ -98,7 +97,8 @@ let option_spec  = {
     "-h"        : [0, 'help'],
 }
 
-let [option, cmd_line]   = parse_cmd_line(option_spec, args)
+// let [option, cmd_line]   = parse_cmd_line(option_spec, args)  // OLD STYLE
+let option   = parse_cmd_line(option_spec, args)
 // console.log(option)
 // console.log(cmd_line)
 if (option.help) {
