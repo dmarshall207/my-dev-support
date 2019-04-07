@@ -38,6 +38,10 @@ copy_file_2(
     'dm1.code-snippets',
     `${process.env.StoRoot}\\my-doc`,
     process.env.SnippetsDirPath)
+copy_file_2(
+    'dm2.code-snippets',
+    `${process.env.StoRoot}\\my-doc`,
+    process.env.SnippetsDirPath)
 
 // console.log('input ')
 // process.stdin.read()
