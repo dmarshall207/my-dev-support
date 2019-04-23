@@ -142,7 +142,9 @@ walk_dir(
     finder,                             // callback - for each match
     (d,f,p)=>f.match(ext_re),           // "want" predicate - filter
     (d,f,p)=>{                          // prune
-        if (prune_re) {
-            return f.match(prune_re)} 
-        else {
-            return false}})
+        // if (prune_re) {                          // ORIG
+        //     return f.match(prune_re)} 
+        let has_prune_flag  = fs.existsSync(`${p}/@prune`)
+        if (has_prune_flag)     {return true}
+        else if (prune_re)      {return f.match(prune_re)} 
+        else                    {return false}})
