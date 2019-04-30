@@ -10,7 +10,6 @@
 
 let fs                      = require('fs')
 
-
 //===================================================
 // aux
 function path_dir(p) {
@@ -46,10 +45,12 @@ function build_spec_regex(raw) {
 let {parse_cmd_line}        = require('dm-std-1')
 let option_spec  = {
     // "-v"        : [0, 'verbose'],
-    "--prune"   : [1, 'prune'],
-    "-p"        : [1, 'prune'],
-    "--help"    : [0, 'help'],
-    "-h"        : [0, 'help'],
+    "--prune"           : [1, 'prune'],
+    "-p"                : [1, 'prune'],
+    "--help"            : [0, 'help'],
+    "-h"                : [0, 'help'],
+    "--gen-index-1"     : [0, 'gen-index-1'],
+
 }
 let option          = parse_cmd_line(option_spec, process.argv.slice(2))
 
@@ -101,21 +102,32 @@ function walk_dir(
             })
         }
 
-console.log('<pre>')
+let sig                 = ['<pre>']
+function sigma(str)     {sig.push(str)}
 
-let cur_dir  = ''
-walk_dir(
-    process.env.StoMy,
-    (d,f,p)=>{ 
-        console.log(`${path_dir(p).padEnd(40)} <a href="file://${p}">${f}</a>`)
-        let dir     = path_dir(p)
-        if (! (cur_dir === dir)) { 
-            console.log('')
-            cur_dir = dir} },
-    (d,f,p)=>{return  f.match('meta') },             // want predicate
-    (d,f,p)=>{                                       // prune
-                let has_prune_flag  = fs.existsSync(`${p}/@prune`)
-                if (has_prune_flag)     {return true}
-                else if (prune_re)      {return f.match(prune_re)} 
-                else                    {return false}} 
-    )
+function do_walk_dir(root_dir) {
+    let cur_dir         = ''
+    walk_dir(
+        root_dir,            // process.env.StoMy,
+        (d,f,p)=>{ 
+            sigma(`${path_dir(p).padEnd(40)} <a href="file://${p}">${f}</a>`)
+            let dir     = path_dir(p)
+            if (! (cur_dir === dir)) { 
+                sigma('')
+                cur_dir = dir} },
+        (d,f,p)=>{return  f.match('meta') },             // want predicate
+        (d,f,p)=>{                                       // prune
+                    let has_prune_flag  = fs.existsSync(`${p}/@prune`)
+                    if (has_prune_flag)     {return true}
+                    else if (prune_re)      {return f.match(prune_re)} 
+                    else                    {return false}} 
+        )
+}
+
+if (option['gen-index-1']) {
+    do_walk_dir(process.env.StoMy) 
+    fs.writeFileSync(`${process.env.StoMy}/meta-index.html`,sig.join('\n'))
+} else {
+    do_walk_dir(process.env.StoMy) 
+    console.log(sig.join('\n'))
+}
