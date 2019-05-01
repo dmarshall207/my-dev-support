@@ -45,8 +45,8 @@ function build_spec_regex(raw) {
 let {parse_cmd_line}        = require('dm-std-1')
 let option_spec  = {
     // "-v"        : [0, 'verbose'],
-    "--prune"           : [1, 'prune'],
-    "-p"                : [1, 'prune'],
+    // "--prune"           : [1, 'prune'],  // :d cur'ly --prune is not sported
+    // "-p"                : [1, 'prune'],
     "--help"            : [0, 'help'],
     "-h"                : [0, 'help'],
     "--gen-index-1"     : [0, 'gen-index-1'],
@@ -85,7 +85,6 @@ function walk_dir(
             if (fs.statSync(path).isDirectory()){
                     let has_prune_flag      = fs.existsSync(`${path}/@prune`)
                     let has_graft_flag      = fs.existsSync(`${path}/@graft`)
-                    
                     if (has_prune_flag && has_graft_flag) {
                             console.log(`\nERR: both 'has_prune_flag' 'has_graft_flag'`)
                             process.exit();}
@@ -105,12 +104,19 @@ function walk_dir(
 let sig                 = ['<pre>']
 function sigma(str)     {sig.push(str)}
 
-function do_walk_dir(root_dir) {
+function pkg_html(d,f,p)   {    // package form html output
+    let sz  = 40 - d.length
+    return `  <a href="file://${d}">${path_dir(p)}</a>${' '.padEnd(sz)} <a href="file://${p}">${f}</a>`
+}
+function pkg_text(d,f,p){      // package for text output
+    return ` ${path_dir(p)}/${f}`}
+
+function do_walk_dir(root_dir, pkg) {
     let cur_dir         = ''
     walk_dir(
         root_dir,            // process.env.StoMy,
         (d,f,p)=>{ 
-            sigma(`${path_dir(p).padEnd(40)} <a href="file://${p}">${f}</a>`)
+            sigma(pkg(d,f,p))
             let dir     = path_dir(p)
             if (! (cur_dir === dir)) { 
                 sigma('')
@@ -124,10 +130,20 @@ function do_walk_dir(root_dir) {
         )
 }
 
-if (option['gen-index-1']) {
-    do_walk_dir(process.env.StoMy) 
+function show_usage() {
+    console.log(`
+--help, -h      : This screen
+--gen-index-1   : Generates 'my/meta-index.html' w/ 'StoMy' root
+    `)
+}
+
+if (option['help']) {
+    show_usage()
+} else if (option['gen-index-1']) {
+    console.log(`... create 'meta-index.html' ...`)
+    do_walk_dir(process.env.StoMy, pkg_html) 
     fs.writeFileSync(`${process.env.StoMy}/meta-index.html`,sig.join('\n'))
 } else {
-    do_walk_dir(process.env.StoMy) 
+    do_walk_dir(process.env.StoMy, pkg_text) 
     console.log(sig.join('\n'))
 }
