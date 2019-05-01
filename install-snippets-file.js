@@ -34,6 +34,12 @@ function copy_file_2(
             else {
                 fs.copyFileSync(src_file_path, dst_file_path)}}
 
+
+if (! fs.existsSync(process.env.SnippetsDirPath)) {     // :new
+    fs.mkdirSync(process.env.SnippetsDirPath, {recursive: true}) }
+// console.log('hi dare ', fs.existsSync(`C:/Users/public1/AppData/Roaming/Code/User/snippets`))
+// console.log(process.env.SnippetsDirPath)
+
 copy_file_2(
     'dm1.code-snippets',
     `${process.env.StoRoot}\\my-doc`,
@@ -42,6 +48,8 @@ copy_file_2(
     'dm2.code-snippets',
     `${process.env.StoRoot}\\my-doc`,
     process.env.SnippetsDirPath)
+
+
 
 // console.log('input ')
 // process.stdin.read()
